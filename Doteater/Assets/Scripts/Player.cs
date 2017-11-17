@@ -12,6 +12,8 @@ public class Player : MonoBehaviour {
 	public float LeftMove;
 	public float UpMove;
 	public float DownMove;
+
+	public float FingerCount;
 	
 	CharacterController characterController;
 	Animator animator;
@@ -35,14 +37,33 @@ public class Player : MonoBehaviour {
 		UpMove    = frame.Hands.Rightmost.PinchStrength;
 		DownMove  = frame.Hands.Leftmost.PinchStrength;
 
-		if (RightMove > 0.5) {
+		FingerCount = frame.Fingers.Extended().Count;
+
+
+		if (RightMove > 0.5 && LeftMove > 0.5) {
+			Process.Start (
+				new ProcessStartInfo {
+					FileName = "osascript",
+					Arguments = "-e 'tell application \"System Events\" to key code 126'"
+				}
+			);
+		}else if(FingerCount > 6){
+			Process.Start (
+				new ProcessStartInfo {
+					FileName = "osascript",
+					Arguments = "-e 'tell application \"System Events\" to key code 125'"
+				}
+			);
+		}
+
+		else if (RightMove > 0.5 && !(LeftMove > 0.5)) {
 			Process.Start (
 				new ProcessStartInfo {
 					FileName = "osascript",
 					Arguments = "-e 'tell application \"System Events\" to key code 124'"
 				}
 			);
-		}else if(LeftMove > 0.5){
+		}else if(LeftMove > 0.5 && !(RightMove > 0.5)){
 			Process.Start (
 				new ProcessStartInfo {
 					FileName = "osascript",
@@ -51,22 +72,10 @@ public class Player : MonoBehaviour {
 			);
 		}
 
-		if (UpMove > 0.5) {
-			Process.Start (
-				new ProcessStartInfo {
-					FileName = "osascript",
-					Arguments = "-e 'tell application \"System Events\" to key code 126'"
-				}
-			);
-		}else if(DownMove > 0.5){
-			Process.Start (
-				new ProcessStartInfo {
-					FileName = "osascript",
-					Arguments = "-e 'tell application \"System Events\" to key code 125'"
-				}
-			);
-		}
-		
+
+
+
+			
 		Vector3 direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 		if (direction.sqrMagnitude > 0.01f) {
 			Vector3 forward = Vector3.Slerp(
